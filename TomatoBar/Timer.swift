@@ -20,6 +20,9 @@ class TBTimer: ObservableObject {
     private var timerFormatter = DateComponentsFormatter()
     @Published var timeLeftString: String = ""
     @Published var timer: DispatchSourceTimer?
+    @Published var isPaused = false
+    private var pausedTimeRemaining: TimeInterval = 0
+    private var pausedFromState: TBStateMachineStates?
 
     init() {
         /*
@@ -112,11 +115,34 @@ class TBTimer: ObservableObject {
     }
 
     func startStop() {
+        // Reset pause state when manually starting/stopping
+        isPaused = false
+        pausedFromState = nil
+        pausedTimeRemaining = 0
         stateMachine <-! .startStop
     }
 
     func skipRest() {
         stateMachine <-! .skipRest
+    }
+
+    func pause() {
+        guard timer != nil, !isPaused else { return }
+        pausedTimeRemaining = finishTime.timeIntervalSince(Date())
+        pausedFromState = stateMachine.state
+        stopTimer()
+        isPaused = true
+        player.stopTicking()
+    }
+
+    func resume() {
+        guard isPaused, pausedFromState != nil else { return }
+        isPaused = false
+        startTimer(seconds: Int(pausedTimeRemaining.rounded(.up)))
+        if pausedFromState == .work {
+            player.startTicking()
+        }
+        pausedFromState = nil
     }
 
     func updateTimeLeft() {
@@ -140,7 +166,7 @@ class TBTimer: ObservableObject {
     }
 
     private func stopTimer() {
-        timer!.cancel()
+        timer?.cancel()
         timer = nil
     }
 
