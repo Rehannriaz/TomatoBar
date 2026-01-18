@@ -240,6 +240,7 @@ class TBTimer: ObservableObject {
         if ctx.event == .skipRest {
             return
         }
+        player.playWindup()
         notificationCenter.send(
             title: NSLocalizedString("TBTimer.onRestFinish.title", comment: "Break is over title"),
             body: NSLocalizedString("TBTimer.onRestFinish.body", comment: "Break is over body"),
