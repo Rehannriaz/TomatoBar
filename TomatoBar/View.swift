@@ -83,6 +83,25 @@ private struct SettingsView: View {
                                        comment: "Launch at login label"))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }.toggleStyle(.switch)
+            Divider()
+            Toggle(isOn: $timer.focusModeEnabled) {
+                Text("Focus Mode")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }.toggleStyle(.switch)
+            if timer.focusModeEnabled {
+                HStack {
+                    Text("Start:")
+                        .frame(width: 36, alignment: .leading)
+                    TextField("Shortcut name", text: $timer.startFocusShortcut)
+                        .textFieldStyle(.roundedBorder)
+                }
+                HStack {
+                    Text("Stop:")
+                        .frame(width: 36, alignment: .leading)
+                    TextField("Shortcut name", text: $timer.stopFocusShortcut)
+                        .textFieldStyle(.roundedBorder)
+                }
+            }
             Spacer().frame(minHeight: 0)
         }
         .padding(4)

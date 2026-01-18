@@ -11,6 +11,10 @@ class TBTimer: ObservableObject {
     @AppStorage("shortRestIntervalLength") var shortRestIntervalLength = 5
     @AppStorage("longRestIntervalLength") var longRestIntervalLength = 15
     @AppStorage("workIntervalsInSet") var workIntervalsInSet = 4
+    // Focus mode integration
+    @AppStorage("focusModeEnabled") var focusModeEnabled = false
+    @AppStorage("startFocusShortcut") var startFocusShortcut = ""
+    @AppStorage("stopFocusShortcut") var stopFocusShortcut = ""
     // This preference is "hidden"
     @AppStorage("overrunTimeLimit") var overrunTimeLimit = -60.0
 
@@ -135,6 +139,9 @@ class TBTimer: ObservableObject {
         stopTimer()
         isPaused = true
         player.stopTicking()
+        if pausedFromState == .work {
+            runShortcut(stopFocusShortcut)
+        }
     }
 
     func resume() {
@@ -143,6 +150,7 @@ class TBTimer: ObservableObject {
         startTimer(seconds: Int(pausedTimeRemaining.rounded(.up)))
         if pausedFromState == .work {
             player.startTicking()
+            runShortcut(startFocusShortcut)
         }
         pausedFromState = nil
     }
@@ -203,10 +211,21 @@ class TBTimer: ObservableObject {
         }
     }
 
+    private func runShortcut(_ name: String) {
+        guard focusModeEnabled, !name.isEmpty else { return }
+        let task = Process()
+        task.launchPath = "/usr/bin/shortcuts"
+        task.arguments = ["run", name]
+        task.standardOutput = FileHandle.nullDevice
+        task.standardError = FileHandle.nullDevice
+        try? task.run()
+    }
+
     private func onWorkStart(context _: TBStateMachine.Context) {
         TBStatusItem.shared.setIcon(name: .work)
         player.playWindup()
         player.startTicking()
+        runShortcut(startFocusShortcut)
         startTimer(seconds: workIntervalLength * 60)
     }
 
@@ -220,6 +239,7 @@ class TBTimer: ObservableObject {
     }
 
     private func onRestStart(context _: TBStateMachine.Context) {
+        runShortcut(stopFocusShortcut)
         var body = NSLocalizedString("TBTimer.onRestStart.short.body", comment: "Short break body")
         var length = shortRestIntervalLength
         var imgName = NSImage.Name.shortRest
@@ -251,6 +271,7 @@ class TBTimer: ObservableObject {
     }
 
     private func onIdleStart(context _: TBStateMachine.Context) {
+        runShortcut(stopFocusShortcut)
         stopTimer()
         TBStatusItem.shared.setIcon(name: .idle)
         consecutiveWorkIntervals = 0
