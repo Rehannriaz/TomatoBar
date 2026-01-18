@@ -3,6 +3,8 @@ import SwiftState
 import SwiftUI
 
 class TBTimer: ObservableObject {
+    static var shared: TBTimer!
+
     @AppStorage("stopAfterBreak") var stopAfterBreak = false
     @AppStorage("showTimerInMenuBar") var showTimerInMenuBar = true
     @AppStorage("workIntervalLength") var workIntervalLength = 25
