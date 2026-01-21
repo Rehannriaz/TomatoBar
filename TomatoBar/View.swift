@@ -12,7 +12,7 @@ private struct IntervalsView: View {
 
     var body: some View {
         VStack {
-            Stepper(value: $timer.workIntervalLength, in: 1 ... 60) {
+            Stepper(value: $timer.workIntervalLength, in: 1 ... 120) {
                 HStack {
                     Text(NSLocalizedString("IntervalsView.workIntervalLength.label",
                                            comment: "Work interval label"))
@@ -20,7 +20,7 @@ private struct IntervalsView: View {
                     Text(String.localizedStringWithFormat(minStr, timer.workIntervalLength))
                 }
             }
-            Stepper(value: $timer.shortRestIntervalLength, in: 1 ... 60) {
+            Stepper(value: $timer.shortRestIntervalLength, in: 1 ... 120) {
                 HStack {
                     Text(NSLocalizedString("IntervalsView.shortRestIntervalLength.label",
                                            comment: "Short rest interval label"))
@@ -28,7 +28,7 @@ private struct IntervalsView: View {
                     Text(String.localizedStringWithFormat(minStr, timer.shortRestIntervalLength))
                 }
             }
-            Stepper(value: $timer.longRestIntervalLength, in: 1 ... 60) {
+            Stepper(value: $timer.longRestIntervalLength, in: 1 ... 120) {
                 HStack {
                     Text(NSLocalizedString("IntervalsView.longRestIntervalLength.label",
                                            comment: "Long rest interval label"))
